@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DashBoard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+  body {
+      font-family: "Lato", sans-serif;
+  }
+
+  .sidenav {
+      height: 100%;
+      width: 200px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #111;
+      overflow-x: hidden;
+      padding-top: 20px;
+  }
+
+  .sidenav a {
+      padding: 6px 6px 6px 32px;
+      text-decoration: none;
+      font-size: 25px;
+      color: #818181;
+      display: block;
+  }
+
+  .sidenav a:hover {
+      color: #f1f1f1;
+  }
+
+  .main {
+      margin-left: 225px; /* Same as the width of the sidenav */
+  }
+
+  @media screen and (max-height: 450px) {
+    .sidenav {padding-top: 15px;}
+    .sidenav a {font-size: 18px;}
+  }
+  </style>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+
+  <div class="sidenav">
+    <a href="#">Activity</a>
+    <a href="#">Usage</a>
+    <a href="#">Control</a>
+    <a href="#">Bill Predictor</a>
+  </div>
+
+  <div class="main">
+    <h2>DashBoard</h2>
+    <p>This Dashboard represents various stats and control option for your IoT setup.</p>
+      <div class="container">
+    <br>
+    <br>
+    <br>
+      <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+              <canvas id="pie-chart" width="800" height="450"></canvas>
+              <canvas id="line-chart" width="800" height="450"></canvas>
+            </div>
+            <div class="col-md-6">
+              <center><h2>Recent Activities</h2></center>
+              <div class="list-group">
+                {% for ra, re in address_and_reviews %}
+                <div class="list-group-item">
+                  <h4 class="list-group-item-heading">{{ re }}</h4>
+                  <p class="list-group-item-text">{{ ra }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+        </div>
+      </div>
+  <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+  <script>
+      var array = [];
+      // $.ajax({
+      //     type: 'GET',
+      //     url: '/api/user/rating/',
+      //     success: function (data) {
+      //         //console.log(data)
+      //         for (var key in data){
+      //           array.push(data[key])
+      //         }
+      //     }
+      // });
+      // console.log(array)
+      new Chart(document.getElementById("pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ["1 Star", "2 Star", "3 Star", "4 Star", "5 Star"],
+      datasets: [{
+        label: "Ratings (Avg. Star)",
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        data: [12, 231, 132, 12332, 4634]
+      }]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Avg ratings of appliances used in your house'
+      }
+    }
+    });
+      new Chart(document.getElementById("line-chart"), {
+  type: 'line',
+  data: {
+    labels: ["00:00-03:00","03:00-06:00","06:00-09:00","09:00-12:00","12:00-15:00","15:00-18:00","18:00-21:00","21:00-24:00"],
+    datasets: [{
+        data: [45,114,221,106,67,150,121,91],
+        label: "Time-Wise Usage Statistics",
+        borderColor: "#3e95cd",
+        fill: false
+      }]
+    },options: {
+    title: {
+      display: true,
+      text: 'Total power usage (in mili watts)'
+    }
+  }
+});
+  </script>
+    </div>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  </body>
+</html>
