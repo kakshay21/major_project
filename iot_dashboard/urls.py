@@ -13,15 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path
 from dashboard.views import dashboard
-# from dashboard.api import MapResource
+from dashboard.api import EquipmentResource
+from django.contrib import admin
+from django.urls import include, path
+from tastypie.api import Api
 
-# entry_resource = MapResource()
+v1_api = Api(api_name='v1')
+v1_api.register(EquipmentResource())
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dash/', dashboard),
-    # path('api/', include(entry_resource.urls)),
+    path('api/', include(v1_api.urls)),
 ]
