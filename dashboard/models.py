@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 # Create your models here.
@@ -16,4 +17,5 @@ class User(models.Model):
 class Usage(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     state = models.BooleanField(default=False)
-    started_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(default=timezone.now())
+    stopped_at = models.DateTimeField(default=timezone.now())
