@@ -62,10 +62,6 @@ class EquipmentResource(ModelResource):
             return self.create_response(request, result)
         equipment_usage = equipment_usage[0]
         required_state = body.get('state')
-        if equipment_usage.state and required_state:
-            pass
-        if not equipment_usage.state and not required_state:
-            pass
         if not equipment_usage.state and required_state:
             equipment_usage.state = required_state
             equipment_usage.started_at = timezone.now()
@@ -73,13 +69,13 @@ class EquipmentResource(ModelResource):
             # toggle gpio switch
         if equipment_usage.state and not required_state:
             equipment_usage.state = required_state
-            equipment_usage.started_at = timezone.now()
+            equipment_usage.stopped_at = timezone.now()
             equipment_usage.save()
             # toggle gpio switch
         result = {
             'name': equipment.name,
             'state': equipment_usage.state,
-            'time': equipment_usage.started_at
+            'usage': equipment_usage.stopped_at - equipment_usage.started_at
         }
         return self.create_response(request, result)
 
