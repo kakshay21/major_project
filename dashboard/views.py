@@ -7,5 +7,9 @@ def dashboard(request):
     return render(request, template_name, {})
 
 def index(request):
-    index_name = 'index.html'
+    index_name = 'login.html'
     return render(request, index_name, {})
+
+def register(request):
+    temp_name = 'register.html'
+    return render(request, temp_name, {})
