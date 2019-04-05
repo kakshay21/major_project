@@ -640,6 +640,19 @@
   <script src="{% static 'assets/vendor/chart.js/dist/Chart.extension.js' %}"></script>
   <!-- Argon JS -->
   <script src="{% static 'assets/js/argon.js' %}"></script>
+  <script>
+    $.ajax(
+           {
+            type: 'POST',
+            url: '/api/v1/equipment/equip/',
+            data: JSON.stringify({'id': 2}),
+            success: function (data) {
+              console.log(data);
+            }
+          }
+        );
+      // console.log(array)
+    </script>
 </body>
 
 </html>
