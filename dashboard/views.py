@@ -13,3 +13,7 @@ def index(request):
 def register(request):
     temp_name = 'register.html'
     return render(request, temp_name, {})
+
+def add_equipment(request):
+    temp_name = 'add_equipment.html'
+    return render(request, temp_name, {})

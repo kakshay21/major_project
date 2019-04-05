@@ -23,17 +23,22 @@ class EquipmentResource(ModelResource):
             url(r"^(?P<equipment_resource>%s)/switch%s$" %
                 (self._meta.equipment_resource, trailing_slash()),
                 self.wrap_view('toggle_equipment'), name='api_toggle_equipment'),
+            url(r"^(?P<equipment_resource>%s)/add%s$" %
+                (self._meta.equipment_resource, trailing_slash()),
+                self.wrap_view('add_equipment'), name='api_add_equipment'),
             url(r"^(?P<user_resource>%s)/login%s$" %
                 (self._meta.user_resource, trailing_slash()),
                 self.wrap_view('validate_user'), name='api_validate_user')
         ]
 
     def validate_key(self, body, key):
-        if not body:
+        if not body or key not in body:
             result = {'status':False, 'message': f'Expected equipment {key}'}
+            return result
         equipment = Equipment.objects.filter(id=body[key])
         if equipment.count() < 1:
             result = {'status':False, 'message': f'Equipment {key} does not exist'}
+            return result
         return {'status': True, 'query': equipment[0]}
 
     def get_equipment(self, request, *args, **kwargs):
@@ -78,6 +83,24 @@ class EquipmentResource(ModelResource):
             'usage': equipment_usage.stopped_at - equipment_usage.started_at
         }
         return self.create_response(request, result)
+
+    def add_equipment(self, request, *args, **kwargs):
+        body = json.loads(request.body)
+        name = body.get('name')
+        if not name:
+            result = {'status':False, 'message': f'Equipment name must not be empty'}
+            return self.create_response(request, result)
+        rating = body.get('rating')
+        if not rating:
+            result = {'status':False, 'message': f'Equipment rating must not be empty'}
+            return self.create_response(request, result)
+        priority = body.get('priority')
+        if not priority:
+            priority = 0
+        equipment = Equipment(name=name, rating=rating, priority=priority)
+        equipment.save()
+        response = {'status': True, 'message': f'{name} is successfully added'}
+        return self.create_response(request, response)
 
     def validate_user(self, request, *args, **kwargs):
         body = json.loads(request.body)
