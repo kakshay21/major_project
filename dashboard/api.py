@@ -32,11 +32,13 @@ class EquipmentResource(ModelResource):
         ]
 
     def validate_key(self, body, key):
-        if not body:
+        if not body or key not in body:
             result = {'status':False, 'message': f'Expected equipment {key}'}
+            return result
         equipment = Equipment.objects.filter(id=body[key])
         if equipment.count() < 1:
             result = {'status':False, 'message': f'Equipment {key} does not exist'}
+            return result
         return {'status': True, 'query': equipment[0]}
 
     def get_equipment(self, request, *args, **kwargs):
