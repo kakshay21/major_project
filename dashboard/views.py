@@ -17,7 +17,3 @@ def register(request):
 def add_equipment(request):
     temp_name = 'add_equipment.html'
     return render(request, temp_name, {})
-    
-def tables(request):
-    temp_name = 'tables.html'
-    return render(request, temp_name, {})
