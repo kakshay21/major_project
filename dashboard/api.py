@@ -33,11 +33,11 @@ class EquipmentResource(ModelResource):
 
     def validate_key(self, body, key):
         if not body or key not in body:
-            result = {'status':False, 'message': f'Expected equipment {key}'}
+            result = {'status':False, 'message': 'Expected equipment {0}'.format(key)}
             return result
         equipment = Equipment.objects.filter(id=body[key])
         if equipment.count() < 1:
-            result = {'status':False, 'message': f'Equipment {key} does not exist'}
+            result = {'status':False, 'message': 'Equipment {0} does not exist'.format(key)}
             return result
         return {'status': True, 'query': equipment[0]}
 
@@ -63,7 +63,7 @@ class EquipmentResource(ModelResource):
         equipment = result['query']
         equipment_usage = Usage.objects.filter(equipment=equipment)
         if equipment_usage.count() < 1:
-            result = {'status':False, 'message': f'{equipment.name}\'s usage does not exist'}
+            result = {'status':False, 'message': '{0}\'s usage does not exist'.format(equipment.name)}
             return self.create_response(request, result)
         equipment_usage = equipment_usage[0]
         required_state = body.get('state')
@@ -71,12 +71,12 @@ class EquipmentResource(ModelResource):
             equipment_usage.state = required_state
             equipment_usage.started_at = timezone.now()
             equipment_usage.save()
-            # toggle gpio switch
+            # TODO: toggle gpio switch
         if equipment_usage.state and not required_state:
             equipment_usage.state = required_state
             equipment_usage.stopped_at = timezone.now()
             equipment_usage.save()
-            # toggle gpio switch
+            # TODO: toggle gpio switch
         result = {
             'name': equipment.name,
             'state': equipment_usage.state,
@@ -88,18 +88,18 @@ class EquipmentResource(ModelResource):
         body = json.loads(request.body)
         name = body.get('name')
         if not name:
-            result = {'status':False, 'message': f'Equipment name must not be empty'}
+            result = {'status':False, 'message': 'Equipment name must not be empty'}
             return self.create_response(request, result)
         rating = body.get('rating')
         if not rating:
-            result = {'status':False, 'message': f'Equipment rating must not be empty'}
+            result = {'status':False, 'message': 'Equipment rating must not be empty'}
             return self.create_response(request, result)
         priority = body.get('priority')
         if not priority:
             priority = 0
         equipment = Equipment(name=name, rating=rating, priority=priority)
         equipment.save()
-        response = {'status': True, 'message': f'{name} is successfully added'}
+        response = {'status': True, 'message': '{0} is successfully added'.format(name)}
         return self.create_response(request, response)
 
     def validate_user(self, request, *args, **kwargs):
