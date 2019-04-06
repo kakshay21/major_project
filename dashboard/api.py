@@ -99,6 +99,8 @@ class EquipmentResource(ModelResource):
             priority = 0
         equipment = Equipment(name=name, rating=rating, priority=priority)
         equipment.save()
+        equip_usage = Usage(equipment=equipment, state=False)
+        equip_usage.save()
         response = {'status': True, 'message': '{0} is successfully added'.format(name)}
         return self.create_response(request, response)
 
