@@ -371,9 +371,9 @@
                       <span class="badge badge-dot">
                         <label class="custom-toggle">
                           {% if equip.state %}
-                          <input type="checkbox" checked>
+                          <input type="checkbox" checked id="{{equip.id}}" onclick='send_equip_state("{{equip.id}}")'>
                           {% else %}
-                          <input type="checkbox" unchecked>
+                          <input type="checkbox" unchecked id="{{equip.id}}" onclick='send_equip_state("{{ equip.id }}")'>
                           {% endif %}
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
@@ -400,32 +400,6 @@
           </div>
         </div>
       </div>
-      <!-- Footer -->
-      <footer class="footer">
-        <div class="row align-items-center justify-content-xl-between">
-          <div class="col-xl-6">
-            <div class="copyright text-center text-xl-left text-muted">
-              &copy; 2018 <a href="https://www.creative-tim.com" class="font-weight-bold ml-1" target="_blank">Creative Tim</a>
-            </div>
-          </div>
-          <div class="col-xl-6">
-            <ul class="nav nav-footer justify-content-center justify-content-xl-end">
-              <li class="nav-item">
-                <a href="https://www.creative-tim.com" class="nav-link" target="_blank">Creative Tim</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://www.creative-tim.com/presentation" class="nav-link" target="_blank">About Us</a>
-              </li>
-              <li class="nav-item">
-                <a href="http://blog.creative-tim.com" class="nav-link" target="_blank">Blog</a>
-              </li>
-              <li class="nav-item">
-                <a href="https://github.com/creativetimofficial/argon-dashboard/blob/master/LICENSE.md" class="nav-link" target="_blank">MIT License</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </footer>
     </div>
   </div>
   <!-- Argon Scripts -->
@@ -438,18 +412,22 @@
   <!-- Argon JS -->
   <script src="{% static 'assets/js/argon.js' %}"></script>
   <script>
-    $.ajax(
-           {
-            type: 'POST',
-            url: '/api/v1/equipment/equip/',
-            data: JSON.stringify({'id': 2}),
-            success: function (data) {
-              console.log(data);
-            }
-          }
-        );
-      // console.log(array)
-    </script>
+    function send_equip_state(id) {
+      var state = false;
+      if ($('#'+id).is(":checked")) {
+        state = true;
+      }
+      var data = {"id": id,"state": state}
+      $.ajax({
+        type: 'POST',
+        url: '/api/v1/equipment/switch/',
+        data: JSON.stringify(data),
+        success: function(response) {
+          console.log('success');
+        }
+      });
+    }
+  </script>
 </body>
 
 </html>
