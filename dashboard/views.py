@@ -9,11 +9,11 @@ def dashboard(request):
     equipments_details = []
     for obj in equipments:
         equip_usage = Usage.objects.filter(equipment=obj)
-        # import pdb; pdb.set_trace()
         state = False
         if equip_usage.count() == 1:
             state = equip_usage[0].state
         equip_ = {
+            'id': obj.id,
             'name': obj.name,
             'rating': obj.rating,
             'state': state,
