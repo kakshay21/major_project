@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from django.utils import timezone
-from dashboard.models import Equipment, User, Usage
+from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
+from dashboard.models import Equipment, Usage
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
 from tastypie.utils.timezone import now
@@ -26,6 +28,9 @@ class EquipmentResource(ModelResource):
             url(r"^(?P<equipment_resource>%s)/add%s$" %
                 (self._meta.equipment_resource, trailing_slash()),
                 self.wrap_view('add_equipment'), name='api_add_equipment'),
+            url(r"^(?P<user_resource>%s)/signup%s$" %
+                (self._meta.user_resource, trailing_slash()),
+                self.wrap_view('create_user'), name='api_create_user'),
             url(r"^(?P<user_resource>%s)/login%s$" %
                 (self._meta.user_resource, trailing_slash()),
                 self.wrap_view('validate_user'), name='api_validate_user')
@@ -104,8 +109,40 @@ class EquipmentResource(ModelResource):
         response = {'status': True, 'message': '{0} is successfully added'.format(name)}
         return self.create_response(request, response)
 
-    def validate_user(self, request, *args, **kwargs):
+    def create_user(self, request, *args, **kwargs):
+        hostname = request.build_absolute_uri('/')
         body = json.loads(request.body)
-        # think about good authentication module
-        result = {'status': True, 'body': body}
-        return self.create_response(request, result)
+        username = body.get('username')
+        email = body.get('email')
+        password = body.get('password')
+        user = User.objects.filter(username=username)
+        if user.count() > 0:
+            resp = {'status': False, 'message': 'Username already exists'}
+            return self.create_response(request, resp)
+        user = User.objects.filter(username=email)
+        if user.count() > 0:
+            resp = {'status': False, 'message': 'Email already in use'}
+            return self.create_response(request, resp)
+        user = User.objects.create_user(username, email, password)
+        user.save()
+        return self.create_response(request, {'status': True, 'redirect': hostname + 'dash/'})
+
+    def validate_user(self, request, *args, **kwargs):
+        hostname = request.build_absolute_uri('/')
+        body = json.loads(request.body)
+        username = body.get('username')
+        email = body.get('email')
+        password = body.get('password')
+        if username:
+            user = User.objects.filter(username=username)
+        else:
+            user = User.objects.filter(email=email)
+        if user.count() < 1:
+            resp = {'status': False, 'message': 'User does not exists'}
+            return self.create_response(request, resp)
+        if not check_password(password, user[0].password):
+            resp = {'status': False, 'message': 'incorrect password'}
+            return self.create_response(request, resp)
+
+        resp = {'status': True, 'redirect': hostname + 'dash/'}
+        return self.create_response(request, resp)
