@@ -172,7 +172,7 @@ class EquipmentResource(ModelResource):
         if user.count() < 1:
             resp = {'status': False, 'message': 'User does not exists'}
             return self.create_response(request, resp)
-        if not check_password(password, user[0].password):
+        if not check_password(password, user.first().password):
             resp = {'status': False, 'message': 'incorrect password'}
             return self.create_response(request, resp)
 

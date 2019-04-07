@@ -38,7 +38,7 @@ def dashboard(request):
 
 def budget(request):
     template_name = 'budget.html'
-    user = User.objects.filter(username='akshay').first()
+    user = User.objects.all().first()
     user_settings = UserSettings.objects.filter(user=user).first()
     context = {'budgets': user_settings.budget}
     return render(request, template_name, context)
