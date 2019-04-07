@@ -13,7 +13,6 @@ def dashboard(request):
     for obj in equipments:
         equip_usage = Usage.objects.filter(equipment=obj)
         state = False
-        total_time = 0
         if equip_usage.count() > 0:
             equip_usage = equip_usage.first()
             state = equip_usage.state
@@ -23,16 +22,20 @@ def dashboard(request):
                 used_till_now =  stop_mins - start_mins
             else:
                 used_till_now = equip_usage.used_mins
+            equip_usage.percent = (used_till_now*100)/obj.max_mins
+            equip_usage.save()
         equip_ = {
             'id': obj.id,
             'name': obj.name,
             'rating': obj.rating,
             'state': state,
             'priority': obj.priority,
-            'usage_left': (used_till_now*100)/obj.max_mins
+            'usage_left': (used_till_now*100)/obj.max_mins,
+            'amount': used_till_now*obj.rating*8/60000
         }
         equipments_details.append(equip_)
-    context = {'equipments': equipments_details}
+    sorted_equip = sorted(equipments_details, key=lambda k: k['usage_left'], reverse=True)
+    context = {'equipments': equipments_details, 'notification':sorted_equip[0:4]}
     return render(request, template_name, context)
 
 
