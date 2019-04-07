@@ -32,5 +32,5 @@ def register(request):
     return render(request, temp_name, {})
 
 def add_equipment(request):
-    temp_name = 'add_equipment.html'
+    temp_name = 'profile.html'
     return render(request, temp_name, {})
