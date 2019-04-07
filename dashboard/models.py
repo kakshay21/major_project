@@ -2,12 +2,14 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+import datetime
 
 # Create your models here.
 class Equipment(models.Model):
     name = models.CharField(max_length=30)
     rating = models.IntegerField()
     priority = models.IntegerField() # higher is more important
+    max_mins = models.IntegerField(default=0) # in mins
 
 
 class UserSettings(models.Model):
@@ -18,5 +20,6 @@ class UserSettings(models.Model):
 class Usage(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.CASCADE)
     state = models.BooleanField(default=False)
-    started_at = models.DateTimeField(default=timezone.now())
-    stopped_at = models.DateTimeField(default=timezone.now())
+    started_at = models.TimeField(default=datetime.datetime.now().time())
+    stopped_at = models.TimeField(default=datetime.datetime.now().time())
+    used_mins = models.IntegerField(default=0)

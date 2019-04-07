@@ -178,14 +178,14 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label class="form-control-label" for="input-username">Equipment Name</label>
-                        <input type="text" id="equip-name" class="form-control form-control-alternative" placeholder="equip_name" required>
+                        <input type="text" id="equip-name" class="form-control form-control-alternative" placeholder="Fridge" required>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label class="form-control-label" for="input-first-name">Rating (in KWh)</label>
+                        <label class="form-control-label" for="input-first-name">Rating (in Watts)</label>
                         <input type="text" id="rating" class="form-control form-control-alternative" placeholder="Rating" required>
                       </div>
                     </div>
@@ -198,6 +198,14 @@
                           <input type="checkbox" id="priority">
                           <span class="custom-toggle-slider rounded-circle"></span>
                         </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label class="form-control-label" for="input-first-name">Max usage hours per day </label>
+                        <input type="text" id="max-hours" class="form-control form-control-alternative" placeholder="Rating" required>
                       </div>
                     </div>
                   </div>
@@ -217,20 +225,28 @@
   <script type="text/javascript">
     function send_equip_details() {
       var equip_name = $('#equip-name').val();
+      var max_hours = $('#max-hours').val();
       var rating = $('#rating').val();
       var priority = false;
+      var continous = false;
       if ($('#priority').is(":checked")) {
         priority = true;
       }
-      var data = {'name':equip_name, 'rating':rating, 'priority': priority};
+      if ($('#continous').is(":checked")) {
+        continous = true;
+      }
+      var data = {'name':equip_name, 'rating':rating, 'max_hours': max_hours, 'priority': priority};
+      // console.log(data);
       $.ajax({
       type: 'POST',
       url: '/api/v1/equipment/add/',
       data: JSON.stringify(data),
       success: function(response) {
-        console.log(response);
+        // console.log(response);
         if (response.status) {
           window.location = response.redirect;
+        } else {
+          alert(response.message);
         }
       }
     });
