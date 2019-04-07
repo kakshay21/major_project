@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from dashboard.models import Equipment, Usage
+from django.contrib.auth.models import User
+from dashboard.models import Equipment, Usage, UserSettings
 
 # Create your views here.
 
@@ -23,13 +24,24 @@ def dashboard(request):
     context = {'equipments': equipments_details}
     return render(request, template_name, context)
 
+
+def budget(request):
+    template_name = 'budget.html'
+    user = User.objects.filter(username='akshay').first()
+    user_settings = UserSettings.objects.filter(user=user).first()
+    context = {'budgets': user_settings.budget}
+    return render(request, template_name, context)
+
+
 def index(request):
     index_name = 'login.html'
     return render(request, index_name, {})
 
+
 def register(request):
     temp_name = 'register.html'
     return render(request, temp_name, {})
+
 
 def add_equipment(request):
     temp_name = 'profile.html'

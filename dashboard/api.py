@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
-from dashboard.models import Equipment, Usage
+from dashboard.models import Equipment, Usage, UserSettings
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
 from tastypie.utils.timezone import now
@@ -33,7 +33,10 @@ class EquipmentResource(ModelResource):
                 self.wrap_view('create_user'), name='api_create_user'),
             url(r"^(?P<user_resource>%s)/login%s$" %
                 (self._meta.user_resource, trailing_slash()),
-                self.wrap_view('validate_user'), name='api_validate_user')
+                self.wrap_view('validate_user'), name='api_validate_user'),
+            url(r"^(?P<user_resource>%s)/budget%s$" %
+                (self._meta.user_resource, trailing_slash()),
+                self.wrap_view('add_budget'), name='api_add_budget')
         ]
 
     def validate_key(self, body, key):
@@ -89,7 +92,19 @@ class EquipmentResource(ModelResource):
         }
         return self.create_response(request, result)
 
+    def add_budget(self, request, *args, **kwargs):
+        hostname = request.build_absolute_uri('/')
+        body = json.loads(request.body)
+        new_budget = body.get('budget')
+        user = User.objects.filter(username='akshay')
+        user_settings = UserSettings.objects.filter(user=user.first()).first()
+        user_settings.budget = new_budget
+        user_settings.save()
+        response = {'status': True, 'redirect': hostname + 'dash/'}
+        return self.create_response(request, response)
+
     def add_equipment(self, request, *args, **kwargs):
+        hostname = request.build_absolute_uri('/')
         body = json.loads(request.body)
         name = body.get('name')
         if not name:
@@ -106,7 +121,7 @@ class EquipmentResource(ModelResource):
         equipment.save()
         equip_usage = Usage(equipment=equipment, state=False)
         equip_usage.save()
-        response = {'status': True, 'message': '{0} is successfully added'.format(name)}
+        response = {'status': True, 'redirect': hostname + 'dash/'}
         return self.create_response(request, response)
 
     def create_user(self, request, *args, **kwargs):
@@ -125,6 +140,8 @@ class EquipmentResource(ModelResource):
             return self.create_response(request, resp)
         user = User.objects.create_user(username, email, password)
         user.save()
+        user_settings = UserSettings(user=user, budget=0, rights=0)
+        user_settings.save()
         return self.create_response(request, {'status': True, 'redirect': hostname + 'dash/'})
 
     def validate_user(self, request, *args, **kwargs):

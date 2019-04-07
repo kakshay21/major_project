@@ -132,7 +132,7 @@
     <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
       <div class="container-fluid">
         <!-- Brand -->
-        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="../index.html">Add Equipement</a>
+        <a class="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="/budget">Update Budget</a>
         <!-- Form -->
         <form class="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
           <div class="form-group mb-0">
@@ -154,8 +154,8 @@
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
           <div class="col-lg-7 col-md-10">
-            <h1 class="display-2 text-white">Add Equipment</h1>
-            <p class="text-white mt-0 mb-5">Here you can add electrical equipments with their power ratings in KWh and priority on a scale of 0-5</p>
+            <h1 class="display-2 text-white">Budget</h1>
+            <p class="text-white mt-0 mb-5">Here you can set your monthly budget</p>
           </div>
         </div>
       </div>
@@ -166,43 +166,31 @@
             <div class="card-header bg-white border-0">
               <div class="row align-items-center">
                 <div class="col-8">
-                  <h3 class="mb-0">Equipment</h3>
+                  <h3 class="mb-0">Budget</h3>
                 </div>
               </div>
             </div>
             <div class="card-body">
               <form>
-                <h6 class="heading-small text-muted mb-4">Equipment information</h6>
+                <h6 class="heading-small text-muted mb-4">Budget of the month</h6>
                 <div class="pl-lg-4">
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label class="form-control-label" for="input-username">Equipment Name</label>
-                        <input type="text" id="equip-name" class="form-control form-control-alternative" placeholder="equip_name" required>
+                        <label class="form-control-label" for="input-username">Current Budget:  {{budgets}}</label>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label class="form-control-label" for="input-first-name">Rating (in KWh)</label>
-                        <input type="text" id="rating" class="form-control form-control-alternative" placeholder="Rating" required>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-lg-6">
-                      <div class="form-group">
-                        <label class="form-control-label" for="input-username">Priority</label><br>
-                        <label class="custom-toggle">
-                          <input type="checkbox" id="priority">
-                          <span class="custom-toggle-slider rounded-circle"></span>
-                        </label>
+                        <label class="form-control-label" for="input-username">New Budget</label>
+                        <input type="text" id="budget" class="form-control form-control-alternative" placeholder="Budget in INR" required>
                       </div>
                     </div>
                   </div>
                   <div class="text-center">
-                    <button type="button" class="btn btn-primary mt-4" onclick="send_equip_details()">Add Equipment</button>
+                    <button type="button" class="btn btn-primary mt-4" onclick="update_budget()">Add Equipment</button>
                   </div>
                 </div>
                 </form>
@@ -215,18 +203,12 @@
   <!-- Argon JS -->
   <script src="{% static 'assets/js/argon.js' %}"></script>
   <script type="text/javascript">
-    function send_equip_details() {
-      var equip_name = $('#equip-name').val();
-      var rating = $('#rating').val();
-      var priority = false;
-      if ($('#priority').is(":checked")) {
-        priority = true;
-      }
-      var data = {'name':equip_name, 'rating':rating, 'priority': priority};
+    function update_budget() {
+      var new_budget = $('#budget').val();
       $.ajax({
       type: 'POST',
-      url: '/api/v1/equipment/add/',
-      data: JSON.stringify(data),
+      url: '/api/v1/user/budget/',
+      data: JSON.stringify({'budget': new_budget}),
       success: function(response) {
         console.log(response);
         if (response.status) {
