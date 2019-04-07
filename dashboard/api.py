@@ -1,11 +1,11 @@
 from django.conf.urls import url
-from django.utils import timezone
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from dashboard.models import Equipment, Usage, UserSettings
+# from dashboard import gpio
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
-from tastypie.utils.timezone import now
 
 import json
 
@@ -47,14 +47,14 @@ class EquipmentResource(ModelResource):
         if equipment.count() < 1:
             result = {'status':False, 'message': 'Equipment {0} does not exist'.format(key)}
             return result
-        return {'status': True, 'query': equipment[0]}
+        return {'status': True, 'query': equipment.first()}
 
     def get_equipment(self, request, *args, **kwargs):
         body = json.loads(request.body)
         result = self.validate_key(body, 'id')
         if not result['status']:
             return self.create_response(request, result)
-        equipment = result['query']
+        equipment = result.get('query')
         response = {
             'name': equipment.name,
             'rating': equipment.rating,
@@ -68,27 +68,34 @@ class EquipmentResource(ModelResource):
         result = self.validate_key(body, 'id')
         if not result['status']:
             return self.create_response(request, result)
-        equipment = result['query']
+        equipment = result.get('query')
         equipment_usage = Usage.objects.filter(equipment=equipment)
         if equipment_usage.count() < 1:
-            result = {'status':False, 'message': '{0}\'s usage does not exist'.format(equipment.name)}
+            result = {
+                'status':False,
+                'message': '{0}\'s usage does not exist'.format(equipment.name)
+            }
             return self.create_response(request, result)
-        equipment_usage = equipment_usage[0]
+        equipment_usage = equipment_usage.first()
         required_state = body.get('state')
         if not equipment_usage.state and required_state:
             equipment_usage.state = required_state
-            equipment_usage.started_at = timezone.now()
+            equipment_usage.started_at = datetime.now().time()
             equipment_usage.save()
             # TODO: toggle gpio switch
+            # gpio.turn_on(16, True)
         if equipment_usage.state and not required_state:
             equipment_usage.state = required_state
-            equipment_usage.stopped_at = timezone.now()
+            equipment_usage.stopped_at = datetime.now().time()
+            stop_mins = equipment_usage.stopped_at.hour*60 + equipment_usage.stopped_at.minute
+            start_mins = equipment_usage.started_at.hour*60 + equipment_usage.started_at.minute
+            equipment_usage.used_mins += stop_mins - start_mins
             equipment_usage.save()
             # TODO: toggle gpio switch
+            # gpio.turn_on(16, False)
         result = {
             'name': equipment.name,
-            'state': equipment_usage.state,
-            'usage': equipment_usage.stopped_at - equipment_usage.started_at
+            'state': equipment_usage.state
         }
         return self.create_response(request, result)
 
@@ -96,7 +103,7 @@ class EquipmentResource(ModelResource):
         hostname = request.build_absolute_uri('/')
         body = json.loads(request.body)
         new_budget = body.get('budget')
-        user = User.objects.filter(username='akshay')
+        user = User.objects.all()
         user_settings = UserSettings.objects.filter(user=user.first()).first()
         user_settings.budget = new_budget
         user_settings.save()
@@ -117,7 +124,15 @@ class EquipmentResource(ModelResource):
         priority = body.get('priority')
         if not priority:
             priority = 0
-        equipment = Equipment(name=name, rating=rating, priority=priority)
+        max_hours = body.get('max_hours')*60
+        if not max_hours:
+            max_hours = 3*60
+        equipment = Equipment(
+            name=name,
+            rating=rating,
+            priority=priority,
+            max_mins=max_hours
+        )
         equipment.save()
         equip_usage = Usage(equipment=equipment, state=False)
         equip_usage.save()

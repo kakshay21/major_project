@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from dashboard.models import Equipment, Usage, UserSettings
 
+
+import datetime
 # Create your views here.
 
 def dashboard(request):
@@ -11,14 +13,23 @@ def dashboard(request):
     for obj in equipments:
         equip_usage = Usage.objects.filter(equipment=obj)
         state = False
-        if equip_usage.count() == 1:
-            state = equip_usage[0].state
+        total_time = 0
+        if equip_usage.count() > 0:
+            equip_usage = equip_usage.first()
+            state = equip_usage.state
+            if state:
+                stop_mins = datetime.datetime.now().time().hour*60 + datetime.datetime.now().time().minute
+                start_mins = equip_usage.started_at.hour*60 + equip_usage.started_at.minute
+                used_till_now =  stop_mins - start_mins
+            else:
+                used_till_now = equip_usage.used_mins
         equip_ = {
             'id': obj.id,
             'name': obj.name,
             'rating': obj.rating,
             'state': state,
-            'priority': obj.priority
+            'priority': obj.priority,
+            'usage_left': (used_till_now*100)/obj.max_mins
         }
         equipments_details.append(equip_)
     context = {'equipments': equipments_details}

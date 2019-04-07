@@ -389,10 +389,16 @@
                     </td>
                     <td>
                       <div class="d-flex align-items-center">
-                        <span class="mr-2">60%</span>
+                        <span class="mr-2">{{ equip.usage_left }}%</span>
                         <div>
                           <div class="progress">
-                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                            {% if equip.usage_left > 75 %}
+                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="{{ equip.usage_left }}" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                            {% else %}
+                            <div class="progress-bar" role="progressbar" aria-valuenow="{{ equip.usage_left }}" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                            </div>
+                            {% endif %}
+                            }
                           </div>
                         </div>
                       </div>
