@@ -205,7 +205,7 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label class="form-control-label" for="input-first-name">Max usage hours per day </label>
-                        <input type="text" id="max-hours" class="form-control form-control-alternative" placeholder="Rating" required>
+                        <input type="text" id="max-mins" class="form-control form-control-alternative" placeholder="Rating" required>
                       </div>
                     </div>
                   </div>
@@ -225,18 +225,16 @@
   <script type="text/javascript">
     function send_equip_details() {
       var equip_name = $('#equip-name').val();
-      var max_hours = $('#max-hours').val();
+      var max_mins = $('#max-mins').val();
       var rating = $('#rating').val();
       var priority = false;
-      var continous = false;
       if ($('#priority').is(":checked")) {
         priority = true;
       }
       if ($('#continous').is(":checked")) {
         continous = true;
       }
-      var data = {'name':equip_name, 'rating':rating, 'max_hours': max_hours, 'priority': priority};
-      // console.log(data);
+      var data = {'name':equip_name, 'rating':rating, 'max_mins': max_mins, 'priority': priority};
       $.ajax({
       type: 'POST',
       url: '/api/v1/equipment/add/',

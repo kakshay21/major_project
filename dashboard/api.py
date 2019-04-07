@@ -124,14 +124,14 @@ class EquipmentResource(ModelResource):
         priority = body.get('priority')
         if not priority:
             priority = 0
-        max_hours = body.get('max_hours')*60
-        if not max_hours:
-            max_hours = 3*60
+        max_mins = int(body.get('max_mins'))*60
+        if not max_mins:
+            max_mins = 3*60
         equipment = Equipment(
             name=name,
             rating=rating,
             priority=priority,
-            max_mins=max_hours
+            max_mins=max_mins
         )
         equipment.save()
         equip_usage = Usage(equipment=equipment, state=False)
