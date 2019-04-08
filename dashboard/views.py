@@ -30,8 +30,8 @@ def dashboard(request):
             'rating': obj.rating,
             'state': state,
             'priority': obj.priority,
-            'usage_left': (used_till_now*100)/obj.max_mins,
-            'amount': used_till_now*obj.rating*8/60000
+            'usage_left': round((used_till_now*100)/obj.max_mins, 2),
+            'amount': round(used_till_now*obj.rating*8/60000, 2)
         }
         equipments_details.append(equip_)
     sorted_equip = sorted(equipments_details, key=lambda k: k['usage_left'], reverse=True)
