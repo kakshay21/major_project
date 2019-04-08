@@ -3,7 +3,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from dashboard.models import Equipment, Usage, UserSettings
-# from dashboard import gpio
+from dashboard import gpio
 from tastypie.resources import ModelResource
 from tastypie.utils.urls import trailing_slash
 
@@ -83,7 +83,7 @@ class EquipmentResource(ModelResource):
             equipment_usage.started_at = datetime.now().time()
             equipment_usage.save()
             # TODO: toggle gpio switch
-            # gpio.turn_on(16, True)
+            gpio.turn_on(16, True)
         if equipment_usage.state and not required_state:
             equipment_usage.state = required_state
             equipment_usage.stopped_at = datetime.now().time()
@@ -92,7 +92,7 @@ class EquipmentResource(ModelResource):
             equipment_usage.used_mins += stop_mins - start_mins
             equipment_usage.save()
             # TODO: toggle gpio switch
-            # gpio.turn_on(16, False)
+            gpio.turn_on(16, False)
         result = {
             'name': equipment.name,
             'state': equipment_usage.state
