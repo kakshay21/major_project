@@ -1,2 +1,2 @@
-Django==2.2.10
+Django==2.2.13
 django-tastypie==0.14.2
